@@ -50,20 +50,19 @@ df_clean.loc[(df_clean['status'] == 'pending') & df_clean['failure_reason'].isna
 
 df_clean['failure_reason'] = df_clean['failure_reason'].fillna("unknown")
 
-df['currency'] = df['currency'].str.lower()
-df.loc[(df['amount'].isna()) & ((df['currency'] == 'inr') | (df['currency'] == 'rs')),'amount'] = 0 
+df_clean['currency'] = df_clean['currency'].str.lower()
+df_clean.loc[(df_clean['amount'].isna()) & ((df_clean['currency'] == 'inr') | (df_clean['currency'] == 'rs')),'amount'] = 0 
 
-df.dropna(subset = ['amount' , 'currency'] , how = 'all' ,inplace = True)
+df_clean.dropna(subset = ['amount' , 'currency'] , how = 'all' ,inplace = True)
 
-df.loc[(df['amount'].notna()) & (df['currency'].isna()) , 'currecny'] = 'inr'
+df_clean.loc[(df_clean['amount'].notna()) & (df_clean['currency'].isna()) , 'currecny'] = 'inr'
 
-df.loc[(df['amount'].notna()) & ((df['currency'] == 'inr') | (df['currency'] == 'rs' )),'currency'] = 'inr'
+df_clean.loc[(df_clean['amount'].notna()) & ((df_clean['currency'] == 'inr') | (df_clean['currency'] == 'rs' )),'currency'] = 'inr'
 
 
 l1 = list(df_clean.columns)
 print(l1)
 print(len(l1))
-df_clean.info()
 
 print(df_clean[['status','failure_reason']])
 #l2 = list(df_clean.dtypes)
@@ -71,5 +70,30 @@ print(df_clean[['status','failure_reason']])
 #print(l2)
 print(df_clean['failure_reason'].value_counts())
 print(len(df_clean))
+
+
+print(df_clean['txn_timestamp'].head())
+
+rand_sec = np.random.randint(0,86400,size = len(df_clean))
+
+df_clean['txn_timestamp'] = df_clean['txn_timestamp'] + pd.to_timedelta(rand_sec,unit = 's')
+
+print(df_clean['txn_timestamp'].head())
+
+df_clean['currency'] = df_clean['currency'].replace('unknown','inr')
+print(df_clean['currency'].value_counts())
+df_clean['signup_date'] = pd.to_datetime(df_clean['signup_date'])
+
+
+#print(df_clean['amount'].value_counts())
+
+df_clean.info()
+df_clean.to_csv('FTT_clean.csv',index = False)
+
+print("entering the cleaned logs in to the Db that has been created already")
+
+df_clean.to_sql(name='FTT_clean',con = conn,if_exists = 'replace',index = False)
+conn.commit()
+
 
 conn.close()
