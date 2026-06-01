@@ -78,6 +78,7 @@ rand_sec = np.random.randint(0,86400,size = len(df_clean))
 
 df_clean['txn_timestamp'] = df_clean['txn_timestamp'] + pd.to_timedelta(rand_sec,unit = 's')
 
+
 print(df_clean['txn_timestamp'].head())
 
 df_clean['currency'] = df_clean['currency'].replace('unknown','inr')
@@ -87,12 +88,19 @@ df_clean['signup_date'] = pd.to_datetime(df_clean['signup_date'])
 
 #print(df_clean['amount'].value_counts())
 
+#df_clean['txn_timestamp'] = df_clean['txn_timestamp'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
 df_clean.info()
-df_clean.to_csv('FTT_clean.csv',index = False)
+#df_clean.to_csv('FTT_clean.csv',index = False)
+
+df_clean.to_parquet('FTT_clean.parquet')
 
 print("entering the cleaned logs in to the Db that has been created already")
 
-df_clean.to_sql(name='FTT_clean',con = conn,if_exists = 'replace',index = False)
+
+
+
+df_clean.to_sql(name='FTT_clean',con = conn,if_exists = 'replace',index = False )
 conn.commit()
 
 
