@@ -85,6 +85,13 @@ df_clean['currency'] = df_clean['currency'].replace('unknown','inr')
 print(df_clean['currency'].value_counts())
 df_clean['signup_date'] = pd.to_datetime(df_clean['signup_date'])
 
+df_clean['device_type'] = df_clean['device_type'].str.lower()
+df_clean['device_type'] = df_clean['device_type'].replace('windows app','desktop app')
+device_types = ['ios','android','web','desktop app']
+mask = df_clean['device_type'] == 'unknown'
+
+df_clean.loc[mask,'device_type'] = np.random.choice(device_types,size = mask.sum())
+print(df_clean['device_type'].value_counts())
 
 #print(df_clean['amount'].value_counts())
 

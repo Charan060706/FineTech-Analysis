@@ -31,3 +31,21 @@ print(len(df1))
 
 #x = list(df1['month_index'] >0)
 #print(len(x))
+
+#letss goo some deep 
+print(df1['cohort_month'].min())
+print(df1['cohort_month'].max())
+
+cohort_counts = df1.groupby(['cohort_month','month_index'])['user_id'].nunique().reset_index()
+
+retention_matrix = cohort_counts.pivot(index = 'cohort_month',columns = 'month_index' ,values='user_id')
+
+cohort_sizes = retention_matrix.iloc[:,0]
+
+retention_pct = retention_matrix.divide(cohort_sizes,axis = 0).round(4)*100
+
+print(retention_pct.head())
+print(cohort_counts)
+print(df1['user_id'].nunique())
+
+print(df1['device_type'].value_counts())

@@ -20,3 +20,8 @@ df.loc[(df['amount'].notna()) & ((df['currency'] == 'inr') | (df['currency'] == 
 
 
 print(df['currency'].value_counts())
+
+df1 = pd.read_parquet('FTT_clean.parquet')
+
+print(df1.info())
+print(df1['device_type'].value_counts())
