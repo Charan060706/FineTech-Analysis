@@ -1,5 +1,7 @@
 import pandas as pd
 import sqlite3 as sql
+from matplotlib import pyplot as plt
+
 path = 'FT_logs.db'
 
 conn = sql.connect(path)
@@ -9,8 +11,8 @@ conn = sql.connect(path)
 df1 = pd.read_parquet('FTT_clean.parquet')
 
 
-print(df1['signup_date'].info())
-print(df1.info())
+#print(df1['signup_date'].info())
+#print(df1.info())
 df1['cohort_month'] = df1['signup_date'].dt.to_period('M').dt.to_timestamp()
 df1['txn_month'] = df1['txn_timestamp'].dt.to_period('M').dt.to_timestamp()
 #print(df1['txn_timestamp'].head())
@@ -27,7 +29,7 @@ df1['month_index'] = (t_yr - s_yr) * 12 + (t_mon - s_mon)
 df1[df1['month_index'] >=0]
 
 print(df1['month_index'].value_counts())
-print(len(df1))
+#print(len(df1))
 
 #x = list(df1['month_index'] >0)
 #print(len(x))
@@ -46,6 +48,15 @@ retention_pct = retention_matrix.divide(cohort_sizes,axis = 0).round(4)*100
 
 print(retention_pct.head())
 print(cohort_counts)
-print(df1['user_id'].nunique())
+#print(df1['user_id'].nunique())
 
-print(df1['device_type'].value_counts())
+#print(df1['device_type'].value_counts())
+avg_retention = retention_pct.mean(axis = 0)
+print(avg_retention)
+plt.figure(figsize=(10,10))
+avg_retention.plot(kind = 'line',marker = 's' ,color = '#00ff88')
+plt.title("Average User Retention Curve")
+plt.xlabel("Months Since Signed-up")
+plt.ylabel("Average Retention Rate (%)")
+plt.grid(True,linestyle = '--',alpha = 0.6)
+plt.savefig('avg_user_ret_curve.png')
