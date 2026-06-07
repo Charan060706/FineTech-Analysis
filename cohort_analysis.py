@@ -60,3 +60,31 @@ plt.xlabel("Months Since Signed-up")
 plt.ylabel("Average Retention Rate (%)")
 plt.grid(True,linestyle = '--',alpha = 0.6)
 plt.savefig('avg_user_ret_curve.png')
+plt.close()
+
+def get_ret_by_segment(df,segment_col):
+    segments = df[segment_col].unique()
+    segment_retention = {}
+
+    for val in segments:
+        if pd.isna(val) or val == 'unknown' : continue
+
+        subset = df[df[segment_col] == val]
+        counts = subset.groupby(['cohort_month','month_index'])['user_id'].nunique().reset_index()
+        pivot = counts.pivot(index = 'cohort_month',columns = 'month_index',values = 'user_id')
+
+        avg_ret = pivot.divide(pivot.iloc[:,0],axis = 0).mean(axis = 0) * 100
+        segment_retention[val] = avg_ret
+
+    return pd.DataFrame(segment_retention)
+
+payment_Segmentation  = get_ret_by_segment(df1,'payment_method')
+payment_Segmentation.plot(figsize = (12,6),marker = 'o',title = 'Retention curve by payment method',grid = True)
+plt.savefig('retention_curve_payment_method')
+
+device_segmention = get_ret_by_segment(df1,'device_type')
+
+device_segmention.plot(figsize = (12,8),marker = 's',title = 'Retention curve by device type',grid = True)
+plt.savefig('retention_curve_device_type')
+
+plt.show()

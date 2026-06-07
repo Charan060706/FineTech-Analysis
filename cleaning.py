@@ -92,7 +92,21 @@ mask = df_clean['device_type'] == 'unknown'
 
 df_clean.loc[mask,'device_type'] = np.random.choice(device_types,size = mask.sum())
 print(df_clean['device_type'].value_counts())
+print(df_clean['payment_method'].unique())
 
+df_clean['payment_method'] = df_clean['payment_method'].str.lower()
+df_clean['payment_method'].replace('debit_card','debit card',inplace = True)
+payment_mapping = {
+    'upi': 'upi',
+    'wallet': 'wallet',
+    'credit card': 'credit card',
+    'debit card': 'debit card',
+    'neft': 'debit card',     
+    'imps': 'debit card',       
+    'unknown': 'debit card'     
+}
+df_clean['payment_method'] = df_clean['payment_method'].map(payment_mapping)
+print(df_clean['payment_method'].value_counts())
 #print(df_clean['amount'].value_counts())
 
 #df_clean['txn_timestamp'] = df_clean['txn_timestamp'].dt.strftime('%Y-%m-%d %H:%M:%S')
